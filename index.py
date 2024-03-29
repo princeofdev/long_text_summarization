@@ -12,8 +12,8 @@ import dotenv
 dotenv.load_dotenv()
 
 API_KEY = os.getenv("OPENAI_API_KEY")
-TOKEN_MAX = os.getenv("TOKEN_MAX")
-CHUNK_SIZE = os.getenv("CHUNK_SIZE")
+TOKEN_MAX = int(os.getenv("TOKEN_MAX"))
+CHUNK_SIZE = int(os.getenv("CHUNK_SIZE"))
 
 # Function to remove URLs from text
 def remove_urls(text):
