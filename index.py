@@ -6,16 +6,27 @@ from langchain_community.document_loaders import TextLoader
 from langchain_text_splitters import CharacterTextSplitter
 from langchain_core.prompts import PromptTemplate
 
+import re
 import os
 import dotenv
 dotenv.load_dotenv()
 
 API_KEY = os.getenv("OPENAI_API_KEY")
-TOKEN_LIMIT = 8192
-CHUNK_SIZE = 1000
+TOKEN_MAX = 4000
+CHUNK_SIZE = 2000
 
-# Load the text file
+# Function to remove URLs from text
+def remove_urls(text):
+    url_pattern = re.compile(r'https?://\S+|www\.\S+')
+    return url_pattern.sub('', text)
+
 text_file_path = "./conversation.txt"
+with open(text_file_path, 'r', encoding='utf-8') as file:
+    text = file.read()
+    text_without_urls = remove_urls(text)
+
+print(text_without_urls)
+# Load the text file
 loader = TextLoader(text_file_path, encoding='utf-8')
 docs = loader.load()
 
@@ -47,7 +58,7 @@ combine_documents_chain = StuffDocumentsChain(
 reduce_documents_chain = ReduceDocumentsChain(
     combine_documents_chain=combine_documents_chain,
     collapse_documents_chain=combine_documents_chain,
-    token_max=TOKEN_LIMIT,
+    token_max=TOKEN_MAX,
 )
 
 # Combining documents by mapping a chain over them, then combining results
