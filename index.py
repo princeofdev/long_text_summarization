@@ -33,18 +33,36 @@ docs = loader.load()
 llm = ChatOpenAI(temperature=0, model='gpt-4', api_key=API_KEY)
 
 # Create LLMChain which is for individual summary
-map_template = """The following is a set of documents
+map_template = """
 {docs}
-Based on this list of docs, please identify the main themes 
-Helpful Answer:"""
+The documents provided contain extensive discussions from a cryptocurrency-focused Telegram group chat. Your task is to identify key themes, token mentions, contributors, and summarize discussions.
+Token Identification and Analysis:
+- Detect and record every mention of crypto tokens identified by the symbol $ or # followed by an acronym of three to six letters.
+- Exclude token mentions followed by numbers or resembling dollar values.
+- List each token's ID, first mention date, total frequency, and users mentioning it.
+Sentiment Analysis:
+- Summarize the overall sentiment expressed about each token and provide a general sentiment analysis.
+- List each token ID, the result of above stuff.
+Contributor Analysis:
+- Identify the top 3 contributors based on the number of messages posted.
+Discussion Summary:
+- Summarize discussions, excluding trivial or off-topic banter, focusing on insights and opinions adding value.
+Title the summary with the message date range. 
+"""
 map_prompt = PromptTemplate.from_template(map_template)
 map_chain = LLMChain(llm=llm, prompt=map_prompt)
 
-# Create LLMCHain which is for reducing summary
-reduce_template = """The following is set of summaries:
+# Create LLMChain which is for reducing summary
+reduce_template = """
 {docs}
-Take these and distill it into a final, consolidated summary of the main themes. 
-Helpful Answer:"""
+Given the individual summaries generated, consolidate them into a final, comprehensive summary while preserving the original structure. 
+List the context of Token Identification and Analysis according to each token ID with the following items.
+Date of first mention:
+Total frequency of mentions:
+Users who mentioned:
+List the context of Sentiment Analysis according to each token ID
+List the top 3 contributors
+"""
 reduce_prompt = PromptTemplate.from_template(reduce_template)
 reduce_chain = LLMChain(llm=llm, prompt=reduce_prompt)
 
