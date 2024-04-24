@@ -35,19 +35,25 @@ llm = ChatOpenAI(temperature=0, model='gpt-4', api_key=API_KEY)
 # Create LLMChain which is for individual summary
 map_template = """
 {docs}
-The documents provided contain extensive discussions from a cryptocurrency-focused Telegram group chat. Your task is to identify key themes, token mentions, contributors, and summarize discussions.
-Token Identification and Analysis:
-- Detect and record every mention of crypto tokens identified by the symbol $ or # followed by an acronym of three to six letters.
-- Exclude token mentions followed by numbers or resembling dollar values.
-- List each token's ID, first mention date, total frequency, and users mentioning it.
-Sentiment Analysis:
-- Summarize the overall sentiment expressed about each token and provide a general sentiment analysis.
-- List each token ID, the result of above stuff.
-Contributor Analysis:
-- Identify the top 3 contributors based on the number of messages posted.
-Discussion Summary:
-- Summarize discussions, excluding trivial or off-topic banter, focusing on insights and opinions adding value.
-Title the summary with the message date range. 
+The documents provided contain extensive discussions from a cryptocurrency-focused Telegram group chat. Your task is to identify key themes and summarize the content with the following structure.
+Explicitly ignore all low-information content such as greetings, casual banter, or repetitive trade alerts that do not contribute substantial information. The summary should be efficient, prioritizing depth and relevance to provide a clear snapshot of the group's discussions and deliver practical knowledge and insights to the reader.
+Core Discussion Themes:
+- Identify the most prevalent and impactful topics discussed, especially those relevant to current market trends, technological advancements, or regulatory changes in cryptocurrency.
+- Exclude routine trade alerts and transient price discussion unless they encapsulate broader market sentiment or trends.
+Strategic Insights:
+- Highlight strategic discussions that offer depth, such as risk management practices, trading strategies, or investment philosophies.
+- Summarize perspectives on market predictions, analysis of coin potential, or debates on blockchain technologies.
+Educational Content:
+- Extract and summarize educational exchanges where users share insights, explain concepts, or debunk common misconceptions (e.g., explanations of "FUD", investment tactics, or technology applications).
+Key Contributors and Opinions:
+- Note influential contributors and summarize their most insightful comments, especially those providing unique insights or expert analysis.
+- Provide context on their influence or expertise if mentioned or evident from discussions.
+Community Sentiment and Reaction:
+- Gauge and report the overall sentiment of the community regarding major events or announcements (e.g., regulatory news, major hacks, or significant market moves).
+- Note shifts in sentiment and their potential triggers.
+Actionable Takeaways:
+- List actionable advice or consensus views that could benefit someone looking to understand or navigate the cryptocurrency market.
+- Include any commonly recommended tools, resources, or strategies discussed among members.
 """
 map_prompt = PromptTemplate.from_template(map_template)
 map_chain = LLMChain(llm=llm, prompt=map_prompt)
@@ -56,12 +62,13 @@ map_chain = LLMChain(llm=llm, prompt=map_prompt)
 reduce_template = """
 {docs}
 Given the individual summaries generated, consolidate them into a final, comprehensive summary while preserving the original structure. 
-List the context of Token Identification and Analysis according to each token ID with the following items.
-Date of first mention:
-Total frequency of mentions:
-Users who mentioned:
-List the context of Sentiment Analysis according to each token ID
-List the top 3 contributors
+List the result with the following items.
+Core Discussion Themes:
+Strategic Insights:
+Educational Content:
+Key Contributors and Opinions:
+Community Sentiment and Reaction:
+Actionable Takeaways:
 """
 reduce_prompt = PromptTemplate.from_template(reduce_template)
 reduce_chain = LLMChain(llm=llm, prompt=reduce_prompt)
